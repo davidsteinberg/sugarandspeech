@@ -28,10 +28,13 @@
 									var dataPOS = data[1]; // pos
 									var dataJSON = data[2]; // json
 									
-									$("#json").append(dataWord+"<br />"+dataPOS);
-									if (dataJSON)
-										$("#json").append("<br />"+dataJSON);
-									$("#json").append("<br /><br />");
+									if (dataJSON) {									
+										$("#json").append(
+											dataWord + "<br />" +
+											dataPOS + "<br />" +
+											dataJSON + "<br /><br />"
+										);
+									}
 								},
 								error : function(data) {
 									console.log(data);
