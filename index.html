@@ -10,13 +10,16 @@
 		$(document).ready(function(){
 			$("#text").focus();
 			$("#start").click(function(){
-				var hist = wordFreq($("#text").val().toLowerCase()); // .replace(/[^\w\s'"]/g,"")
+				var textValue = $("#text").val();
+				var hist = wordFreq(textValue.toLowerCase()); // .replace(/[^\w\s'"]/g,"")
+				var totalCount = 0;
 				for (var i in hist) {
 //					if (hist[i] > 1) {
 						var minArr = new Array(i);
 						var taggedWords = new POSTagger().tag(minArr);
 						var pos = taggedWords[0][1];
 						if (keepWord(pos)) {
+							totalCount++;
 							$.ajax({
 								url : "helper.php",
 								type : "POST",
@@ -27,13 +30,16 @@
 									var dataWord = data[0]; // word
 									var dataPOS = data[1]; // pos
 									var dataJSON = data[2]; // json
-									
+
+									totalCount--;
+									if (totalCount == 0) {
+										$("#highlighted").html(textValue);
+									}
+
 									if (dataJSON) {
-										$("#json").append(
-											dataWord + "<br />" +
-											dataPOS + "<br />" +
-											dataJSON + "<br /><br />"
-										);
+										var regex = new RegExp(dataWord,"gi");
+										// dataPOS
+										textValue = textValue.replace(regex,dataWord+"_____");
 									}
 								},
 								error : function(data) {
@@ -54,6 +60,6 @@
 	<br />
 	<br />
 	<br />
-	<div id="json"></div>
+	<div id="highlighted"></div>
 </body>
 </html>
