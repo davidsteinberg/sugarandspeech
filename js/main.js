@@ -1,13 +1,14 @@
 $(document).ready(function(){
+	$("#responsive_headline").fitText(1.2);
 	$("#text").focus();
 	$("#start").click(function(){
-		$("#loading").html("");
+		$("#progresser").css("width","0%");
+		$("#progresser").addClass("active");
 		var textValue = $("#text").val();
 		var hist = wordFreq(textValue.toLowerCase()); // .replace(/[^\w\s'"]/g,"")
 		var totalCount = 0;
-		var wordMax = $("#wordMax").val() - 1;
 		for (var i in hist) {
-			if (hist[i] > wordMax) {
+			if (hist[i] > 0) {
 				var minArr = new Array(i);
 				var taggedWords = new POSTagger().tag(minArr);
 				var pos = taggedWords[0][1];
@@ -24,7 +25,8 @@ $(document).ready(function(){
 							var dataPOS = inData[1]; // pos
 							var dataJSON = JSON.parse(inData[2]); // json
 
-							$("#loading").append("."); // change to size of div
+							var percent = totalCount+"%";
+							$("#progresser").css("width",percent);
 
 							if (dataJSON) {
 								var regex = new RegExp("\\b"+dataWord+"\\b","gi");
@@ -39,6 +41,8 @@ $(document).ready(function(){
 							totalCount--;
 							if (totalCount == 0) {
 								$("#highlighted").html(textValue);
+								$("#progresser").css("width","100%");
+								$("#progresser").removeClass("active");
 							}
 						},
 						error : function(data) {
