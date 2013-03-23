@@ -3,7 +3,6 @@ $(document).ready(function(){
 	$("#text").focus();
 	$("#start").click(function(){
 		$("#progresser").css("width","0%");
-		$("#progresser").addClass("active");
 		var textValue = $("#text").val();
 		var hist = wordFreq(textValue.toLowerCase()); // .replace(/[^\w\s'"]/g,"")
 		var totalCount = 0;
@@ -40,9 +39,9 @@ $(document).ready(function(){
 
 							totalCount--;
 							if (totalCount == 0) {
-								$("#highlighted").html(textValue);
 								$("#progresser").css("width","100%");
-								$("#progresser").removeClass("active");
+								$("#text").css("display","none");
+								$("#chooserArea").html(textValue).css("display","block");
 							}
 						},
 						error : function(data) {
