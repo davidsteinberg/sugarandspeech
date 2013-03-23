@@ -39,13 +39,47 @@
 		);
 	}
 
+	//------------------------------------------------------
+	// Dictionary API Setup
+	//------------------------------------------------------
+
+	require 'include/SkPublishAPI.php';
+
+	class RequestHandler implements SkPublishAPIRequestHandler {
+		public function prepareGetRequest($curl, $uri, &$headers) {
+			// print($uri."\n");
+			$headers[] = "Accept: application/json";
+		}
+	}
+
+	$baseUrl = "https://dictionary.cambridge.org";
+	$accessKey = "nFDGeMlZeWoM54FxNT4X7hOloAZ6DrddUf6XPzHvTzxu4XMdKwyJPOGWHR0EftmE";
+
+	$requestHandler = new RequestHandler();
+
+	$api = new SkPublishAPI($baseUrl.'/api/v1', $accessKey);
+	$api->setRequestHandler($requestHandler);
+
+	//------------------------------------------------------
+	// GET BASE WORD
+	//------------------------------------------------------
+
+	$word = $_POST["word"];
+
+	$dict = "american-english";
+
+	$pageNum = 1;
+	$pagePos = 1;
+
+	$search = json_decode($api->search($dict, $word, $pageNum, $pagePos), true);
+
+	$baseWord = preg_replace("/[_\d]/", "", $search["results"][0]["entryId"]);
+
 	//--------------------------	
 	// THESAURUS IT UP
 	//--------------------------
 
-	$word = "animal"; // $_POST["word"];
-
-	$url = "http://words.bighugelabs.com/api/2/e0ba19998c26c80016f2a7c5ed35683f/".$word."/json";
+	$url = "http://words.bighugelabs.com/api/2/e0ba19998c26c80016f2a7c5ed35683f/".$baseWord."/json";
 
 	$json = json_decode(file_get_contents($url));
 
@@ -53,7 +87,7 @@
 	// CHECK POS
 	//--------------------------
 
-	$posReal = "NN"; // $_POST["pos"];
+	$posReal = $_POST["pos"];
 
 	$jsonFinal;
 
@@ -62,6 +96,35 @@
 			if ($key == "verb") {
 				foreach ($json2 as $key2 => $json3) {
 					if ($key2 == "syn") {
+						if ($posReal == "VBD") { // If past tense
+							$i = 0;
+							foreach ($json3 as $wordPiece) {
+								$json3[$i] .= "ed"; // need to know when to use different endings...
+								$i++;
+							}
+						}
+						else if ($posReal == "VBG") { // If gerund
+							$i = 0;
+							foreach ($json3 as $wordPiece) {
+								$json3[$i] .= "ing"; // need to know when to use different endings...
+								$i++;
+							}
+						}
+						else if ($posReal == "VBN") { // If past (had, has)
+							$i = 0;
+							foreach ($json3 as $wordPiece) {
+								$json3[$i] .= "ed"; // need to know when to use different endings...
+								$i++;
+							}
+						}
+						else if ($posReal == "VBZ") { // If present
+							$i = 0;
+							foreach ($json3 as $wordPiece) {
+								$json3[$i] .= "s"; // need to know when to not use s
+								$i++;
+							}
+						}
+
 						$jsonFinal = json_encode($json3);
 						break;
 					}
@@ -75,6 +138,13 @@
 			if ($key == "noun") {
 				foreach ($json2 as $key2 => $json3) {
 					if ($key2 == "syn") {
+						if ($posReal == "NNS") { // If plural, add 's' to ends of synonyms
+							$i = 0;
+							foreach ($json3 as $wordPiece) {
+								$json3[$i] .= "s"; // need to know when to use "es"
+								$i++;
+							}
+						}
 						$jsonFinal = json_encode($json3);
 						break;
 					}
@@ -88,6 +158,21 @@
 			if ($key == "adjective") {
 				foreach ($json2 as $key2 => $json3) {
 					if ($key2 == "syn") {
+						if ($posReal == "JJR") { // If 'er', add proper ending or more
+							$i = 0;
+							foreach ($json3 as $wordPiece) {
+								$json3[$i] = "more " . $json3[$i]; // need to know when to use "er"
+								$i++;
+							}
+						}
+						else if ($posReal == "JJS") { // If 'est', add proper ending or most
+							$i = 0;
+							foreach ($json3 as $wordPiece) {
+								$json3[$i] = "most " . $json3[$i]; // need to know when to use "est"
+								$i++;
+							}
+						}
+
 						$jsonFinal = json_encode($json3);
 						break;
 					}
@@ -101,6 +186,21 @@
 			if ($key == "adverb") {
 				foreach ($json2 as $key2 => $json3) {
 					if ($key2 == "syn") {
+						if ($posReal == "RBR") { // If 'er', add proper ending or more
+							$i = 0;
+							foreach ($json3 as $wordPiece) {
+								$json3[$i] = "more " . $json3[$i]; // need to know when to use "er"
+								$i++;
+							}
+						}
+						else if ($posReal == "RBS") { // If 'est', add proper ending or most
+							$i = 0;
+							foreach ($json3 as $wordPiece) {
+								$json3[$i] = "most " . $json3[$i]; // need to know when to use "est"
+								$i++;
+							}
+						}
+
 						$jsonFinal = json_encode($json3);
 						break;
 					}
@@ -108,61 +208,8 @@
 				break;
 			}
 		}
-	}	
-
-	//------------------------------------------------------
-	// Dictionary API Setup
-	//------------------------------------------------------
-
-	require 'include/SkPublishAPI.php';
-
-	class RequestHandler implements SkPublishAPIRequestHandler {
-		public function prepareGetRequest($curl, $uri, &$headers) {
-			// print($uri."\n");
-			$headers[] = "Accept: application/json";
-		}
 	}
-	
-	$baseUrl = "https://dictionary.cambridge.org";
-	$accessKey = "nFDGeMlZeWoM54FxNT4X7hOloAZ6DrddUf6XPzHvTzxu4XMdKwyJPOGWHR0EftmE";
 
-	$requestHandler = new RequestHandler();
-
-	$api = new SkPublishAPI($baseUrl.'/api/v1', $accessKey);
-	$api->setRequestHandler($requestHandler);
-
-	//------------------------------------------------------
-	// Search
-	//------------------------------------------------------
-
-	$dict = "american-english";
-
-	$pageNum = 1;
-	$pagePos = 1;
-
-	foreach (json_decode($jsonFinal) as $wordPiece) {
-		$wordPieces = explode(" ",$wordPiece);
-		if (sizeof($wordPieces) > 1)
-			$wordPiece = $wordPieces[sizeof($wordPieces)-1];
-		else
-			$wordPiece = "goose";
-
-		$search = json_decode($api->search($dict, $wordPiece, $pageNum, $pagePos), true);
-		$entry = json_decode($api->getEntry($dict, $search["results"][0]["entryId"], "json"), true);
-		$pieces = new SimpleXMLElement($entry["entryContent"]);
-		var_dump($pieces); // ->header->info->irreg-infls->inf-group->f
-	}
-/*
-	if ($pieces->header->info->posgram->pos == "n") {
-		array_push($words,$w);
-
-		foreach ($tokens as $token) {
-			if (!in_array($token, $words)) {
-				findWords($token);
-			}
-		}
-	}
-*/
 	//--------------------------
 	// BUILD DATA ARRAY
 	//--------------------------
