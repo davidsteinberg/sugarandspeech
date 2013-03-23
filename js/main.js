@@ -1,11 +1,13 @@
 $(document).ready(function(){
 	$("#text").focus();
 	$("#start").click(function(){
+		$("#loading").html("");
 		var textValue = $("#text").val();
 		var hist = wordFreq(textValue.toLowerCase()); // .replace(/[^\w\s'"]/g,"")
 		var totalCount = 0;
+		var wordMax = $("#wordMax").val() - 1;
 		for (var i in hist) {
-//			if (hist[i] > 1) {
+			if (hist[i] > wordMax) {
 				var minArr = new Array(i);
 				var taggedWords = new POSTagger().tag(minArr);
 				var pos = taggedWords[0][1];
@@ -16,24 +18,22 @@ $(document).ready(function(){
 						type : "POST",
 						data : { word: i, pos: pos },
 						success : function (data) {
-						
-							data = JSON.parse(data);
+							var inData = JSON.parse(data);
 
-							var dataWord = data[0]; // word
-							var dataPOS = data[1]; // pos
-							var dataJSON = JSON.parse(data[2]); // json
+							var dataWord = inData[0]; // word
+							var dataPOS = inData[1]; // pos
+							var dataJSON = JSON.parse(inData[2]); // json
 
-							console.log(dataWord + " complete");
+							$("#loading").append("."); // change to size of div
 
 							if (dataJSON) {
-								var regex = new RegExp(dataWord,"gi");
-								// dataPOS
-								var dropdown = "<select>";
+								var regex = new RegExp("\\b"+dataWord+"\\b","gi");
+								var dropdown = "<select><option selected>"+dataWord+"</option>";
 								for (jsonBit in dataJSON) {
 									dropdown += "<option>" + dataJSON[jsonBit] + "</option>";
 								}
 								dropdown += "</select>";
-								textValue = textValue.replace(regex,dataWord+dropdown);
+								textValue = textValue.replace(regex,dropdown);
 							}
 
 							totalCount--;
@@ -46,7 +46,7 @@ $(document).ready(function(){
 						}
 					});
 				}
-//			}
+			}
 		}
 	});
 });
