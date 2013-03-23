@@ -64,7 +64,7 @@
 	</div>
 	<div class="row-fluid" style="height: 70%">
 		<div class="span12" style="height: 100%">
-			<textarea placeholder="Enter text here and click the Smart button." id="text" style="width: 98.5%;height: 100%;"></textarea>
+			<textarea placeholder="Enter text here and click the Smart button." id="text" style="width: 98.7%;height: 100%;"></textarea>
 			<div id="chooserArea"></div>
 		</div>
 	</div>
@@ -82,7 +82,7 @@
 			<a class="bottomScript">A spoonful of sugar makes you sound smart...</a>
 		</div>
 		<div class="span4">
-			<button id="start" style="float: right">Smart</button>
+			<input type="button" id="start" style="float: right" value="Smart" />
 		</div>
 	</div>
 </div>

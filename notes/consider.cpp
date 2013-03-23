@@ -9,20 +9,11 @@ past tense
 - if two words
 	- just past tense the first
 
-don't do numbers
-
-dont do more or most
-
 pluralize
 - if y, go to 'ies'
 
 pluralize and/or 3rd person present
 - if 'ch' or 'ss', add 'es' not 's'
-
-dont do not
-
-be is weird...
-
 
 non standards
 - send -> sent
