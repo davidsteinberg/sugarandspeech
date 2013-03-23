@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Thesaurus Rex</title>
+	<script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
+	<script src="wordFreq.js"></script>
+	<script src="POSTagger.js"></script>	
+	<script src="keepWord.js"></script>
+	<script>
+		$(document).ready(function(){
+			$("#text").focus();
+			$("#start").click(function(){
+				var hist = wordFreq($("#text").val().toLowerCase()); // .replace(/[^\w\s'"]/g,"")
+				for (var i in hist) {
+//					if (hist[i] > 1) {
+						var minArr = new Array(i);
+						var taggedWords = new POSTagger().tag(minArr);
+						var pos = taggedWords[0][1];
+						if (keepWord(pos)) {
+							$.ajax({
+								url : "helper.php",
+								type : "POST",
+								data : { word: i, pos: pos },
+								success : function (data) {
+									data = JSON.parse(data);
+
+									var dataWord = data[0]; // word
+									var dataPOS = data[1]; // pos
+									var dataJSON = data[2]; // json
+									
+									$("#json").append(dataWord+"<br />"+dataPOS);
+									if (dataJSON)
+										$("#json").append("<br />"+dataJSON);
+									$("#json").append("<br /><br />");
+								},
+								error : function(data) {
+									console.log(data);
+								}
+							});
+						}
+//					}
+				}
+			});
+		});
+	</script>
+	<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+	<textarea id="text"></textarea>
+	<button id="start">Start</button>
+	<br />
+	<br />
+	<br />
+	<div id="json"></div>
+</body>
+</html>

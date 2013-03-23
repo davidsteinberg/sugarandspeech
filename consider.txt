@@ -1,0 +1,15 @@
+words you have repeated again and again
+- recommend additional vocab for those
+
+word count
+- words with more than 1 or 2
+
+can check:
+- number of repeats of word
+- proximity of words
+	- how far apart should they be?
+
+considerations
+- if there are words that are both verbs and nouns (for example)
+	- should have two separate counters for them
+
