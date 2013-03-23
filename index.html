@@ -29,17 +29,26 @@
 
 									var dataWord = data[0]; // word
 									var dataPOS = data[1]; // pos
-									var dataJSON = data[2]; // json
+									var dataJSON = JSON.parse(data[2]); // json
 
-									totalCount--;
-									if (totalCount == 0) {
-										$("#highlighted").html(textValue);
+									if (pos == "NNS") {
+										
 									}
 
 									if (dataJSON) {
 										var regex = new RegExp(dataWord,"gi");
 										// dataPOS
-										textValue = textValue.replace(regex,dataWord+"_____");
+										var dropdown = "<select>";
+										for (jsonBit in dataJSON) {
+											dropdown += "<option>" + dataJSON[jsonBit] + "</option>";
+										}
+										dropdown += "</select>";
+										textValue = textValue.replace(regex,dataWord+dropdown);
+									}
+
+									totalCount--;
+									if (totalCount == 0) {
+										$("#highlighted").html(textValue);
 									}
 								},
 								error : function(data) {
