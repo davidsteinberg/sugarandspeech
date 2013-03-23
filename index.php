@@ -40,9 +40,11 @@
 			left: -90px;
 			top: 25px;
 			color: lightblue;
+			text-decoration: none;
 			text-shadow: 1px 1px 1px navy;
 		}
 		a.bottomScript {
+			text-decoration: none;
 			color: white;
 			text-shadow: 1px 1px 1px lightblue;
 			font-family: cursive;
